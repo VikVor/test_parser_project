@@ -5,6 +5,8 @@ def connect():
     conn = sqlite3.connect('flats.db')
     return conn
 
+a = 'some'
+
 def create_flats_table():
     conn = connect()
     cur = conn.cursor()
