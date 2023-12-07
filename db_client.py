@@ -1,11 +1,13 @@
 import sqlite3
-
+from pprint import pprint
 
 def connect():
     conn = sqlite3.connect('flats.db')
     return conn
 
+
 a = 'some'
+
 
 def create_flats_table():
     conn = connect()
@@ -19,7 +21,7 @@ def create_flats_table():
     image TEXT,
     rooms TEXT,
     square TEXT,
-    year TEXT
+    year TEXT,
     floor TEXT,
     type_house TEXT,
     region TEXT,
@@ -28,13 +30,16 @@ def create_flats_table():
     district TEXT,
     coordinates TEXT
     )""")
-create_flats_table()
+
+# connect().cursor().execute("""DROP TABLE flats""")
+# create_flats_table()
 
 
-def insert_flat(flat:dict):
+def insert_flat(flat: dict) -> object:
     conn = connect()
     cur = conn.cursor()
-    cur.execute("""INSERT INT0 flats(flat_id, 
+    cur.execute(""" INSERT INTO flats(
+    flat_id, 
     title,
     price,
     description,
@@ -50,8 +55,11 @@ def insert_flat(flat:dict):
     district,
     coordinates
     
-    ) VALUES (:flat_id, :title, :price,
-    :decription,
+    ) VALUES (
+    :flat_id,
+    :title,
+    :price,
+    :description,
     :image,
     :rooms,
     :square,
@@ -62,8 +70,35 @@ def insert_flat(flat:dict):
     :city,
     :street,
     :district,
-    :coordinates
-     )""", flat)
+    :coordinates) ON CONFLICT (flat_id) DO UPDATE SET price = :price """, flat)
 
     conn.commit()
     conn.close()
+
+
+def get_all_flats():
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("""SELECT * FROM flats""")
+    data = cur.fetchall()
+    conn.close()
+
+    return data
+
+def get_flat_data(query, params=None):
+    conn = connect()
+    cur = conn.cursor()
+    if params:
+        cur.execute(query, params)
+    else:
+        cur.execute(query)
+        data = cur.fetchall()
+    conn.close()
+
+    return data
+
+
+q = """SELECT * FROM flats ORDER BY price"""
+print(get_flat_data(q))
+
+print(get_all_flats())
